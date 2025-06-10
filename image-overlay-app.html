@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Defender - Protect Your Images</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
+            min-height: 100vh;
+            color: #ffffff;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+        
+        .subtitle {
+            color: #8b92a9;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+        
+        .main-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .watermark-settings {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .watermark-options {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .radio-option input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+        
+        .radio-label {
+            color: #ffffff;
+            font-size: 0.95rem;
+        }
+        
+        .custom-url-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .custom-url-input input[type="text"] {
+            flex: 1;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+        
+        .custom-url-input input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .custom-url-input input[type="text"]::placeholder {
+            color: #8b92a9;
+        }
+        
+        .btn-apply {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-apply:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-apply:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .url-help {
+            color: #8b92a9;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+        
+        .example-urls {
+            margin-top: 10px;
+            color: #8b92a9;
+            font-size: 0.85rem;
+        }
+        
+        .example-urls summary {
+            cursor: pointer;
+            color: #667eea;
+            font-weight: 500;
+            margin-bottom: 10px;
+            transition: color 0.2s ease;
+        }
+        
+        .example-urls summary:hover {
+            color: #764ba2;
+        }
+        
+        .example-list {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .example-list code {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .upload-area {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px dashed rgba(102, 126, 234, 0.5);
+            border-radius: 16px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 30px;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .upload-area.active {
+            border-color: #764ba2;
+            background: rgba(118, 75, 162, 0.1);
+        }
+        
+        .upload-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .upload-icon svg {
+            width: 30px;
+            height: 30px;
+            color: white;
+        }
+        
+        .upload-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ffffff;
+        }
+        
+        .upload-subtitle {
+            color: #8b92a9;
+            font-size: 0.95rem;
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #8b92a9;
+            transition: all 0.3s ease;
+        }
+        
+        .status-badge.success {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        
+        .status-badge.error {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+        
+        .controls-section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .position-selector {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8b92a9;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .position-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        
+        .position-btn {
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .position-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: scale(1.05);
+        }
+        
+        .position-btn.active {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+        
+        .position-btn::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+        
+        .position-btn.active::after {
+            background: #667eea;
+        }
+        
+        .position-btn[data-position="top-left"]::after { top: 20%; left: 20%; }
+        .position-btn[data-position="top-center"]::after { top: 20%; left: 50%; transform: translateX(-50%); }
+        .position-btn[data-position="top-right"]::after { top: 20%; right: 20%; }
+        .position-btn[data-position="middle-left"]::after { top: 50%; left: 20%; transform: translateY(-50%); }
+        .position-btn[data-position="middle-center"]::after { top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .position-btn[data-position="middle-right"]::after { top: 50%; right: 20%; transform: translateY(-50%); }
+        .position-btn[data-position="bottom-left"]::after { bottom: 20%; left: 20%; }
+        .position-btn[data-position="bottom-center"]::after { bottom: 20%; left: 50%; transform: translateX(-50%); }
+        .position-btn[data-position="bottom-right"]::after { bottom: 20%; right: 20%; }
+        
+        .slider-group {
+            margin-bottom: 25px;
+        }
+        
+        .slider-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .slider-label span:first-child {
+            color: #ffffff;
+            font-weight: 500;
+        }
+        
+        .slider-value {
+            color: #667eea;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #667eea;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 2px 12px rgba(102, 126, 234, 0.5);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #667eea;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        .preview-section {
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        #canvas {
+            max-width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: none;
+            margin-bottom: 30px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+            font-size: 1rem;
+            display: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Image Defender</h1>
+            <p class="subtitle">Protect your images with custom watermarks</p>
+        </div>
+        
+        <div class="main-card">
+            <div style="text-align: center;">
+                <span id="overlayStatus" class="status-badge">Loading watermark...</span>
+            </div>
+            
+            <div class="watermark-settings">
+                <div class="section-title">Watermark Source</div>
+                <div class="watermark-options">
+                    <label class="radio-option">
+                        <input type="radio" name="watermarkType" value="default" checked>
+                        <span class="radio-label">Use default watermark</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="watermarkType" value="custom">
+                        <span class="radio-label">Use custom watermark URL</span>
+                    </label>
+                </div>
+                <div class="custom-url-input" id="customUrlInput" style="display: none;">
+                    <input type="text" id="watermarkUrl" placeholder="Enter image URL (e.g., https://example.com/logo.png)">
+                    <button class="btn-apply" id="applyUrl">Apply</button>
+                </div>
+                <div class="url-help">
+                    <small>⚠️ <strong>Important:</strong> Direct Google Images URLs won't work due to CORS restrictions. The image must be hosted on a server that allows cross-origin requests.</small>
+                </div>
+                <details class="example-urls">
+                    <summary>Working URL Examples & Tips</summary>
+                    <div class="example-list">
+                        <code>https://i.imgur.com/your-image.png</code>
+                        <code>https://raw.githubusercontent.com/username/repo/main/image.png</code>
+                        <code>https://res.cloudinary.com/your-cloud/image/upload/logo.png</code>
+                        <div style="margin-top: 10px; padding: 10px; background: rgba(102, 126, 234, 0.1); border-radius: 8px;">
+                            <strong>Pro tip:</strong> Upload your watermark to GitHub (in your repo) or Imgur for best results. Google Images, Instagram, and most social media image URLs won't work due to CORS policies.
+                        </div>
+                    </div>
+                </details>
+            </div>
+            
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                </div>
+                <div class="upload-title">Drop your image here</div>
+                <div class="upload-subtitle">or click to browse</div>
+                <input type="file" id="mainImage" accept="image/*">
+            </div>
+            
+            <div class="controls-section" id="controlsSection">
+                <div class="position-selector">
+                    <div class="section-title">Watermark Position</div>
+                    <div class="position-grid">
+                        <button class="position-btn" data-position="top-left"></button>
+                        <button class="position-btn" data-position="top-center"></button>
+                        <button class="position-btn" data-position="top-right"></button>
+                        <button class="position-btn" data-position="middle-left"></button>
+                        <button class="position-btn" data-position="middle-center"></button>
+                        <button class="position-btn" data-position="middle-right"></button>
+                        <button class="position-btn" data-position="bottom-left"></button>
+                        <button class="position-btn" data-position="bottom-center"></button>
+                        <button class="position-btn active" data-position="bottom-right"></button>
+                    </div>
+                </div>
+                
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>Size</span>
+                        <span class="slider-value"><span id="sizeValue">25</span>%</span>
+                    </div>
+                    <input type="range" id="overlaySize" min="10" max="50" value="25">
+                </div>
+                
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>Opacity</span>
+                        <span class="slider-value"><span id="opacityValue">100</span>%</span>
+                    </div>
+                    <input type="range" id="overlayOpacity" min="0" max="100" value="100">
+                </div>
+            </div>
+            
+            <div class="preview-section">
+                <canvas id="canvas"></canvas>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="downloadBtn">Download Protected Image</button>
+                    <button class="btn btn-secondary" id="resetBtn">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ============================================
+         * CONFIGURATION
+         * ============================================ */
+        
+        const DEFAULT_OVERLAY_URL = 'https://via.placeholder.com/200x80/ffffff/667eea?text=PROTECTED';
+        let OVERLAY_IMAGE_URL = DEFAULT_OVERLAY_URL;
+        
+        /* ============================================
+         * APPLICATION CODE
+         * ============================================ */
+        
+        let mainImg = null;
+        let overlayImg = null;
+        let currentPosition = 'bottom-right';
+        let overlayScale = 0.25;
+        let overlayOpacity = 1.0;
+        
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const uploadArea = document.getElementById('uploadArea');
+        const controlsSection = document.getElementById('controlsSection');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const overlaySizeInput = document.getElementById('overlaySize');
+        const overlayOpacityInput = document.getElementById('overlayOpacity');
+        const sizeValue = document.getElementById('sizeValue');
+        const opacityValue = document.getElementById('opacityValue');
+        const overlayStatus = document.getElementById('overlayStatus');
+        const customUrlInput = document.getElementById('customUrlInput');
+        const watermarkUrlField = document.getElementById('watermarkUrl');
+        const applyUrlBtn = document.getElementById('applyUrl');
+        
+        // Load default watermark on page load
+        window.addEventListener('load', () => {
+            loadWatermark(DEFAULT_OVERLAY_URL);
+        });
+        
+        // Handle watermark type selection
+        document.querySelectorAll('input[name="watermarkType"]').forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.value === 'custom') {
+                    customUrlInput.style.display = 'flex';
+                } else {
+                    customUrlInput.style.display = 'none';
+                    loadWatermark(DEFAULT_OVERLAY_URL);
+                }
+            });
+        });
+        
+        // Apply custom URL
+        applyUrlBtn.addEventListener('click', () => {
+            const url = watermarkUrlField.value.trim();
+            if (url) {
+                applyUrlBtn.textContent = 'Loading...';
+                applyUrlBtn.disabled = true;
+                loadWatermark(url);
+                setTimeout(() => {
+                    applyUrlBtn.textContent = 'Apply';
+                    applyUrlBtn.disabled = false;
+                }, 1000);
+            }
+        });
+        
+        // Allow Enter key to apply URL
+        watermarkUrlField.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                applyUrlBtn.click();
+            }
+        });
+        
+        function loadWatermark(url) {
+            overlayStatus.textContent = 'Loading watermark...';
+            overlayStatus.classList.remove('success', 'error');
+            
+            const tempImg = new Image();
+            tempImg.crossOrigin = 'anonymous';
+            
+            tempImg.onload = () => {
+                overlayImg = tempImg;
+                OVERLAY_IMAGE_URL = url;
+                overlayStatus.textContent = 'Watermark ready';
+                overlayStatus.classList.add('success');
+                if (mainImg) {
+                    renderComposite();
+                }
+            };
+            
+            tempImg.onerror = () => {
+                overlayStatus.textContent = 'Failed to load watermark (CORS or invalid URL)';
+                overlayStatus.classList.add('error');
+                // If custom URL fails, offer to revert to default
+                if (url !== DEFAULT_OVERLAY_URL) {
+                    setTimeout(() => {
+                        if (confirm('Failed to load custom watermark. Use default instead?')) {
+                            document.querySelector('input[value="default"]').checked = true;
+                            customUrlInput.style.display = 'none';
+                            loadWatermark(DEFAULT_OVERLAY_URL);
+                        }
+                    }, 100);
+                }
+            };
+            
+            tempImg.src = url;
+        }
+        
+        // Drag and drop functionality
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('active');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('active');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('active');
+            
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleImageUpload(file);
+            }
+        });
+        
+        // Click to upload
+        uploadArea.addEventListener('click', () => {
+            document.getElementById('mainImage').click();
+        });
+        
+        document.getElementById('mainImage').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                handleImageUpload(file);
+            }
+        });
+        
+        function handleImageUpload(file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                mainImg = new Image();
+                mainImg.onload = () => {
+                    uploadArea.querySelector('.upload-title').textContent = 'Image loaded successfully';
+                    uploadArea.querySelector('.upload-subtitle').textContent = file.name;
+                    checkAndRender();
+                };
+                mainImg.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        // Position selector
+        document.querySelectorAll('.position-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.position-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentPosition = btn.dataset.position;
+                renderComposite();
+            });
+        });
+        
+        // Slider controls
+        overlaySizeInput.addEventListener('input', (e) => {
+            overlayScale = e.target.value / 100;
+            sizeValue.textContent = e.target.value;
+            renderComposite();
+        });
+        
+        overlayOpacityInput.addEventListener('input', (e) => {
+            overlayOpacity = e.target.value / 100;
+            opacityValue.textContent = e.target.value;
+            renderComposite();
+        });
+        
+        // Action buttons
+        downloadBtn.addEventListener('click', () => {
+            const link = document.createElement('a');
+            link.download = 'protected-image.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        });
+        
+        resetBtn.addEventListener('click', () => {
+            mainImg = null;
+            canvas.style.display = 'none';
+            controlsSection.style.display = 'none';
+            downloadBtn.style.display = 'none';
+            resetBtn.style.display = 'none';
+            uploadArea.querySelector('.upload-title').textContent = 'Drop your image here';
+            uploadArea.querySelector('.upload-subtitle').textContent = 'or click to browse';
+            document.getElementById('mainImage').value = '';
+            // Keep watermark settings as they are
+        });
+        
+        function checkAndRender() {
+            if (mainImg && overlayImg) {
+                controlsSection.style.display = 'block';
+                renderComposite();
+            }
+        }
+        
+        function renderComposite() {
+            if (!mainImg || !overlayImg) return;
+            
+            canvas.width = mainImg.width;
+            canvas.height = mainImg.height;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(mainImg, 0, 0);
+            
+            const overlayWidth = mainImg.width * overlayScale;
+            const overlayHeight = (overlayImg.height / overlayImg.width) * overlayWidth;
+            const padding = mainImg.width * 0.02;
+            let x, y;
+            
+            switch (currentPosition) {
+                case 'top-left':
+                    x = padding;
+                    y = padding;
+                    break;
+                case 'top-center':
+                    x = (canvas.width - overlayWidth) / 2;
+                    y = padding;
+                    break;
+                case 'top-right':
+                    x = canvas.width - overlayWidth - padding;
+                    y = padding;
+                    break;
+                case 'middle-left':
+                    x = padding;
+                    y = (canvas.height - overlayHeight) / 2;
+                    break;
+                case 'middle-center':
+                    x = (canvas.width - overlayWidth) / 2;
+                    y = (canvas.height - overlayHeight) / 2;
+                    break;
+                case 'middle-right':
+                    x = canvas.width - overlayWidth - padding;
+                    y = (canvas.height - overlayHeight) / 2;
+                    break;
+                case 'bottom-left':
+                    x = padding;
+                    y = canvas.height - overlayHeight - padding;
+                    break;
+                case 'bottom-center':
+                    x = (canvas.width - overlayWidth) / 2;
+                    y = canvas.height - overlayHeight - padding;
+                    break;
+                case 'bottom-right':
+                    x = canvas.width - overlayWidth - padding;
+                    y = canvas.height - overlayHeight - padding;
+                    break;
+            }
+            
+            ctx.globalAlpha = overlayOpacity;
+            ctx.drawImage(overlayImg, x, y, overlayWidth, overlayHeight);
+            ctx.globalAlpha = 1.0;
+            
+            canvas.style.display = 'block';
+            downloadBtn.style.display = 'inline-block';
+            resetBtn.style.display = 'inline-block';
+        }
+    </script>
+</body>
+</html>
