@@ -531,6 +531,13 @@
                     </div>
                     <input type="range" id="overlayOpacity" min="0" max="100" value="100">
                 </div>
+
+                <div class="slider-group">
+                    <div class="slider-label">
+                        <span>Tile across whole image</span>
+                        <input type="checkbox" id="tileMode">
+                    </div>
+                </div>
             </div>
             
             <div class="preview-section">
@@ -560,6 +567,7 @@
         let currentPosition = 'bottom-right';
         let overlayScale = 0.25;
         let overlayOpacity = 1.0;
+        let tileMode = false;
         
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
@@ -705,6 +713,11 @@
             });
         });
         
+        document.getElementById('tileMode').addEventListener('change', (e) => {
+            tileMode = e.target.checked;
+            renderComposite();
+        });
+
         // Slider controls
         overlaySizeInput.addEventListener('input', (e) => {
             overlayScale = e.target.value / 100;
@@ -756,6 +769,23 @@
             
             const overlayWidth = mainImg.width * overlayScale;
             const overlayHeight = (overlayImg.height / overlayImg.width) * overlayWidth;
+
+            ctx.globalAlpha = overlayOpacity;
+            if (tileMode) {
+                const stepX = overlayWidth * 0.7;
+                const stepY = overlayHeight * 0.7;
+                for (let ty = 0; ty < canvas.height; ty += stepY) {
+                    for (let tx = 0; tx < canvas.width; tx += stepX) {
+                        ctx.drawImage(overlayImg, tx, ty, overlayWidth, overlayHeight);
+                    }
+                }
+                ctx.globalAlpha = 1.0;
+                canvas.style.display = 'block';
+                downloadBtn.style.display = 'inline-block';
+                resetBtn.style.display = 'inline-block';
+                return;
+            }
+
             const padding = mainImg.width * 0.02;
             let x, y;
             
